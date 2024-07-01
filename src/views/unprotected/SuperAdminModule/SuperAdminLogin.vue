@@ -14,7 +14,26 @@ import { toast } from '@/components/ui/toast'
 import router from '@/router'
 import { useSuperAdminStore } from '@/stores/super-admin/super-admin'
 import axios from 'axios'
+// import { ability } from '@/lib/ability'
+// import { useAbilityStore } from '@/stores/permissions/permission-store'
 
+// import { useAbilityStore } from '@/stores/permissions/permission-store'
+// const ability = useAbilityStore().ability
+// const updateAbility = useAbilityStore().updateAbility
+
+
+// console.log(ability.can('rea', 'Post') )// true)
+// console.log(ability.can('delete', 'Post')) // true)
+// setTimeout(()=>{
+//   // ability.update({'delete': 'Post'})
+//   // ability.update([]);
+//   ability.update([ // switch to readonly mode
+//   { action: 'rea', subject: 'Post' }
+// ]);
+//   setTimeout(()=>{
+//     console.log(ability.can('rea', 'Post') )// true)
+//   }, 3000)
+// }, 3000)
 const currentYear = ref(new Date().getFullYear())
 
 const updateYear = () => {
@@ -84,6 +103,8 @@ const onSubmit = form.handleSubmit(async () => {
     superAdminStore.setPassword(password)
 
     try {
+      console.log('userEmail', userEmail)
+
       const response = await axios.post('https://api.staging.weeshr.com/api/v1/admin/login', {
         email: userEmail,
         password: password
@@ -91,11 +112,28 @@ const onSubmit = form.handleSubmit(async () => {
 
       // Check if the token property exists in the response
       if (response.data.data && response.data.data.user && response.data.data.user.token) {
-        // Access the token from the response data
+        // Access the data from the response data
+        // token
         const token = response.data.data.user.token
+        //  firstname
+        const firstName = response.data.data.user.firstName
+        // lastname
+        const lastName = response.data.data.user.lastName
+        // email
+        const userEmail = response.data.data.user.email
 
+        // save basic user data to local storage
+        superAdminStore.setLocalStorage(firstName, lastName, userEmail)
+        // save user email
+        superAdminStore.setuserEmail(userEmail)
         // Save the token in Pinia store
         superAdminStore.setToken(token)
+        sessionStorage.setItem('permissions', JSON.stringify(response.data.data.user.permissions))
+        // console.log(response.data)
+        // const permissions = modPermissions(response.data.data.user.permissions)
+        // ability.update(permissions)
+        // updateAbility(permissions)
+        // useAbilityStore().permissions = permissions
 
         // Save the token in sessionStorage
 

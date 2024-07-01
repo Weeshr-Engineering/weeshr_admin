@@ -129,7 +129,6 @@ import {
               </CardHeader>
               <CardContent class="pl-2">
                 <Overview />
-              
               </CardContent>
             </Card>
             <Card class="flex grid w-full col-span-full sm:col-span-3">

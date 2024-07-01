@@ -172,7 +172,7 @@ const fetchUsersData = async () => {
 const saveUserData = async (user: any) => {
   loading.value = true
   try {
-    const response = await axios.post('https://api.staging.weeshr.com/api/v1/administrator', user, {
+    const response = await axios.post('', user, {
       headers: {
         Authorization: `Bearer ${token}`
       }

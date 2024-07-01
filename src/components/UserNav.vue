@@ -14,6 +14,7 @@ import {
 import { useSuperAdminStore } from '@/stores/super-admin/super-admin'
 
 const superAdminStore = useSuperAdminStore()
+const user = superAdminStore.getLocalstorageData()
 
 const logout = async () => {
   await superAdminStore.logout()
@@ -27,14 +28,14 @@ const logout = async () => {
         variant="ghost"
         class="relative h-12 w-12 bg-[#EBCE7E] hover:bg-[#EBCE7E] rounded-2xl ml-2"
       >
-        KP
+      {{user.firstname[0]}}{{user.lastname[0]}}
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent class="w-56" align="end">
       <DropdownMenuLabel class="flex font-normal">
         <div class="flex flex-col space-y-1">
-          <p class="text-sm font-medium leading-none">Kp</p>
-          <p class="text-xs leading-none text-muted-foreground">test@weeshr.com</p>
+          <p class="text-sm font-medium leading-none">{{user.firstname[0]}}{{user.lastname[0]}}</p>
+          <p class="text-xs leading-none text-muted-foreground">{{user.email}}</p>
         </div>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />

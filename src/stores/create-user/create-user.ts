@@ -42,5 +42,5 @@ interface User {
 
   dateJoined?: string
   status: boolean
-  category: string
+  // category: string
 }
