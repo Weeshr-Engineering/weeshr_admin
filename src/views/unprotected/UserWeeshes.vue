@@ -403,7 +403,7 @@ const handlePageChange = (page: number) => {
 }
 </script>
 
-<style scoped>
+<style>
 .cardShadow1 {
   box-shadow:
     0px 31px 30px -23px #dddcdc,

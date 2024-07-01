@@ -35,6 +35,51 @@ interface Log {
   description: string
 }
 
+export interface Weeshes {
+  _id: string
+  name: string
+  wishYear: string
+  isLocked: boolean
+  isPriority: boolean
+  status: string
+  images: [
+    {
+      _id: string
+      url: string
+    }
+  ]
+  category: {
+    name: string
+  }
+  price: {
+    price: number
+    genieGratuity: number
+    total: number
+  }
+  currency: {
+    code: string
+  }
+  contributions: [
+    {
+      _id: string
+      isContributorAnonymous: boolean
+      amount: number
+      contributor: {
+        avatar: string
+        firstName: string
+        lastName: string
+      }
+    }
+  ]
+}
+interface Wallet {
+  id: string
+  account_number: string
+  account_name: string
+  balance: number
+  ledger_balance: number
+}
+
 const token = sessionStorage.getItem('token') || ''
 const { toast } = useToast()
 
@@ -46,7 +91,7 @@ export const getUser = () => {
     try {
       toast({
         description: 'Loading....',
-        variant:'loading'
+        variant: 'loading'
       })
       const response = await axios.get(
         'https://api.staging.weeshr.com/api/v1/admin/accounts/users/' + _id,
@@ -91,7 +136,7 @@ export const getUserLog = () => {
     try {
       toast({
         description: 'Loading....',
-        variant:'loading'
+        variant: 'loading'
       })
       const response = await axios.get(
         `https://api.staging.weeshr.com/api/v1/admin/accounts/user/${_id}/logs?&per_page=${perPage}&page_item_from=${next}`,
@@ -129,7 +174,154 @@ export const getUserLog = () => {
   return { userLog, count, logError, log }
 }
 
+export const getUserWeeshes = () => {
+  const userWeeshesList: Ref<Weeshes[]> = ref([])
+  const weeshesError: Ref<string> = ref('')
+  const totalPages = ref(0)
+  const currentPage = ref(0)
+
+  const userWeeshes = async (_id: string | string[], options?: string | number) => {
+    const base = `https://api.staging.weeshr.com/api/v1/admin/accounts/users/${_id}/weeshes?`
+
+    const url = () => {
+      if (typeof options === 'string') {
+        if (options === 'asc' || options === 'desc') {
+          return base + `sort_by_price=${options}`
+        } else if (options !== 'asc' && options !== 'desc') {
+          return base + `search=${options}`
+        }
+      } else if (typeof options === 'number') {
+        return base + `page=${options}`
+      }
+      return base
+    }
+
+    try {
+      toast({
+        description: 'Loading....',
+        variant: 'loading'
+      })
+      const response = await axios.get(url(), {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (response.data.code === 200) {
+        userWeeshesList.value = response.data.data.data
+        totalPages.value = response.data.data.totalPages
+        currentPage.value = response.data.data.currentPage
+
+        toast({
+          description: response.data.message,
+          variant: 'success'
+        })
+      } else {
+        weeshesError.value = response.data.message
+        toast({
+          description: response.data.message,
+          variant: 'destructive'
+        })
+      }
+    } catch (err: any) {
+      weeshesError.value = err.message
+      toast({
+        description: err.message,
+        variant: 'destructive'
+      })
+    }
+  }
+
+  return { userWeeshesList, weeshesError, totalPages, currentPage, userWeeshes }
+}
+
+export const getUserWallet = () => {
+  const userWallet = ref<Wallet | null>(null)
+
+  const getWallet = async (_id: string | string[]) => {
+    try {
+      toast({
+        description: 'Loading....',
+        variant: 'loading'
+      })
+      const response = await axios.get(
+        `https://api.staging.weeshr.com/api/v1/admin/user/${_id}/wallet`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (response.data.code === 200) {
+        userWallet.value = response.data.data
+        toast({
+          description: response.data.message,
+          variant: 'success'
+        })
+      } else {
+        toast({
+          description: response.data.message,
+          variant: 'destructive'
+        })
+      }
+    } catch (err: any) {
+      toast({
+        description: err.message,
+        variant: 'destructive'
+      })
+    }
+  }
+  return { userWallet, getWallet }
+}
+
+export const getUserWalletList = () => {
+  const userWalletList = ref<Wallet | null>(null)
+  const walletError: Ref<string> = ref('')
+
+  const getWalletList = async (_id: string | string[]) => {
+    try {
+      toast({
+        description: 'Loading....',
+        variant: 'loading'
+      })
+      const response = await axios.get(
+        `https://api.staging.weeshr.com/api/v1/admin/user/${_id}/wallet/transactions`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (response.data.code === 200) {
+        userWalletList.value = response.data.data.data
+        toast({
+          description: response.data.message,
+          variant: 'success'
+        })
+      } else {
+        walletError.value = response.data.message
+        toast({
+          description: response.data.message,
+          variant: 'destructive'
+        })
+      }
+    } catch (err: any) {
+      walletError.value = err.message
+      toast({
+        description: err.message,
+        variant: 'destructive'
+      })
+    }
+  }
+  return { walletError, userWalletList, getWalletList }
+}
+
 export default {
   getUser,
-  getUserLog
+  getUserLog,
+  getUserWeeshes,
+  getUserWallet,
+  getUserWalletList
 }

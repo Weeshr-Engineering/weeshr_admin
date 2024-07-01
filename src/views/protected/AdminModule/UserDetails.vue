@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardDescription, CardHeader } from '@/components/ui/card'
-import {
-  Table,
-  TableRow,
-  TableBody,
-  TableHeader,
-  TableCell,
-  TableHead
-} from '@/components/ui/table'
+import { Table, TableRow, TableBody, TableHeader, TableHead } from '@/components/ui/table'
 
 import {
   Carousel,
@@ -19,8 +12,15 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel'
+
 import { Button } from '@/components/ui/button'
-import { getUser, getUserLog } from '@/composables/getUser'
+import {
+  getUser,
+  getUserLog,
+  getUserWallet,
+  getUserWalletList,
+  getUserWeeshes
+} from '@/composables/getUser'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { Pagination, PaginationList, PaginationListItem } from '@/components/ui/pagination'
@@ -30,173 +30,12 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-
-// const users = ref([]);
-const users = ref<any[]>([
-  {
-    _id: 1,
-    nameofweeshes: 'iPhone 15 Pro Max',
-    category: 'Gadgets',
-    price: '₦ 1,565,987.00',
-    changes: '₦ 5,987.00',
-    status: ['Initiated']
-  },
-  {
-    _id: 2,
-    nameofweeshes: 'Mary K Facial Cleanser',
-    category: 'Body & Beauty',
-    price: '₦ 51,000,087.6',
-    changes: '₦ 100,087.21',
-    status: ['Added']
-  },
-  {
-    _id: 3,
-    nameofweeshes: '2014 Honda Accord',
-    category: 'Automobile',
-    price: '₦ 1,927.05',
-    changes: '₦ 1,230.00',
-    status: ['Added']
-  },
-  {
-    _id: 4,
-    nameofweeshes: 'Lacoste White Sneakers',
-    category: 'Footwear',
-    price: '₦ 15,927.05',
-    changes: '₦ 230.00',
-    status: ['Fulfiled']
-  },
-  {
-    _id: 5,
-    nameofweeshes: 'Money',
-    category: 'Cash',
-    price: '₦ 1,333,230.00',
-    changes: '₦ 531,927.05',
-    status: ['Delivered']
-  },
-  {
-    _id: 6,
-    nameofweeshes: 'Zara Men Winter Coat',
-    category: 'Clothing',
-    price: '₦ 122,927.05',
-    changes: '₦ 17,230.00',
-    status: ['Delivered']
-  },
-  {
-    _id: 7,
-    nameofweeshes: 'S&P 500',
-    category: 'Investments',
-    price: '₦ 111,230.00',
-    changes: '₦ 1,230.00',
-    status: ['Added']
-  },
-  {
-    _id: 8,
-    nameofweeshes: 'Maldives Invaders',
-    category: 'Trip',
-    price: '₦ 900,230.00',
-    changes: '₦ 11,230.00',
-    status: ['Initiated']
-  },
-  {
-    _id: 9,
-    nameofweeshes: 'Hisense Double Door Fri..',
-    category: 'Appliance',
-    price: '₦ 340,230.00',
-    changes: '₦ 17,230.00',
-    status: ['Fulfiled']
-  },
-  {
-    _id: 10,
-    nameofweeshes: 'Raddison Blue Buffet',
-    category: 'Food',
-    price: '₦ 1,230.00',
-    changes: '₦ 0.00',
-    status: ['Fulfiled']
-  }
-])
-
-const user2s = ref<any[]>([
-  {
-    _id: 1,
-    type: 'Inflow',
-    date: '01 Nov 1978',
-    amount: '₦ 1,565,987.00',
-    changes: '₦ 5,987.00',
-    status: ['Successful']
-  },
-  {
-    _id: 2,
-    type: 'Inflow',
-    date: '03 Sep 1995',
-    amount: '₦ 51,000,087.6',
-    changes: '₦ 100,087.21',
-    status: ['Successful']
-  },
-  {
-    _id: 3,
-    type: 'Inflow',
-    date: '25 Aug 1994',
-    amount: '₦ 1,927.05',
-    changes: '₦ 1,230.00',
-    status: ['Successful']
-  },
-  {
-    _id: 4,
-    type: 'Outflow',
-    date: '06 Apr 1991',
-    amount: '₦ 15,927.05',
-    changes: '₦ 230.00',
-    status: ['Pending']
-  },
-  {
-    _id: 5,
-    type: 'Inflow',
-    date: '28 Dec 1988',
-    amount: '₦ 1,333,230.00',
-    changes: '₦ 531,927.05',
-    status: ['Failed']
-  },
-  {
-    _id: 6,
-    type: 'Outflow',
-    date: '13 Jul 1982',
-    amount: '₦ 122,927.05',
-    changes: '₦ 17,230.00',
-    status: ['Failed']
-  },
-  {
-    _id: 7,
-    type: 'Inflow',
-    date: '25 Jul 1986',
-    amount: '₦ 111,230.00',
-    changes: '₦ 1,230.00',
-    status: ['Successful']
-  },
-  {
-    _id: 8,
-    type: 'Outflow',
-    date: '12 Oct 1987',
-    amount: '₦ 900,230.00',
-    changes: '₦ 11,230.00',
-    status: ['Successful']
-  },
-  {
-    _id: 9,
-    type: 'Outflow',
-    date: '03 Mar 1996',
-    amount: '₦ 340,230.00',
-    changes: '₦ 17,230.00',
-    status: ['Successful']
-  },
-  {
-    _id: 10,
-    type: 'Inflow',
-    date: '17 May 1999',
-    amount: '₦ 1,230.00',
-    changes: '₦ 0.00',
-    status: ['Failed']
-  }
-])
+import Search from '@/components/UseSearch.vue'
+import { Progress } from '@/components/ui/progress'
+import type { Weeshes } from '@/composables/getUser'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { reactive } from 'vue'
+import PagePagination from '@/components/PagePagination.vue'
 
 //images dummy
 const images = ref<any[]>([
@@ -218,10 +57,19 @@ const _id = route.params.id
 
 const { appUser, error, load } = getUser()
 const { userLog, count, logError, log } = getUserLog()
+const { userWeeshesList, weeshesError, totalPages, currentPage, userWeeshes } = getUserWeeshes()
+const { userWallet, getWallet } = getUserWallet()
+const { walletError, userWalletList, getWalletList } = getUserWalletList()
 
 onMounted(() => {
   load(_id)
+  userWeeshes(_id)
 })
+
+const wallet = (_id: string | string[]) => {
+  getWallet(_id)
+  getWalletList(_id)
+}
 
 const dateFormat = (dob: string, time?: string): string => {
   const date = new Date(dob)
@@ -260,6 +108,7 @@ const dateFormat = (dob: string, time?: string): string => {
   return formattedDate
 }
 
+//Sort user log
 let order = ref<string>('')
 
 const handleSort = () => {
@@ -279,10 +128,66 @@ const sortItem = computed(() => {
   return userLogs
 })
 
+//search
+const search = ref('')
+
+watch(search, () => {
+  userWeeshes(_id, search.value)
+})
+
+// Sortby price
+const sortPrice = ref('desc')
+
+watch(sortPrice, () => {
+  userWeeshes(_id, sortPrice.value)
+})
+
+//contributor list
+interface VisibleContributors {
+  [key: string]: boolean
+}
+
+const visibleContributors: VisibleContributors = reactive({})
+
+function toggleContributors(id: string) {
+  visibleContributors[id] = !visibleContributors[id]
+}
+
+//progress bar
+const getContributionPercentage = (weeshes: Weeshes) => {
+  const totalContributions = weeshes.contributions.reduce(
+    (sum: number, contribution) => sum + contribution.amount,
+    0
+  )
+  const percentage = Math.floor((totalContributions / weeshes.price.total) * 100)
+  return percentage > 100 ? 100 : percentage
+}
+
+//status
+const statusBg = (status: string) => {
+  switch (status) {
+    case 'ADDED':
+      return 'bg-[#000000]'
+    case 'INITIATED':
+      return 'bg-[#ee9f39]'
+    case 'FULFILLED':
+      return 'bg-[#6a70ff]'
+    case 'DELIVERED':
+      return 'bg-[#00c37f]'
+    case 'OUTBOUND':
+      return 'bg-[#fc045c]'
+    case 'PENDING':
+      return 'bg-[#4287f5]'
+  }
+}
+
 //pagination
 const pageTotal = ref(count)
-let perPage = ref(20)
+const perPage = ref(20)
 const pageCurrent = ref(1)
+
+const weeshesPageTotal = ref(totalPages)
+const weeshesCurrentPage = ref(currentPage)
 
 const handleClick = (pageItem: number) => {
   perPage.value = pageItem
@@ -328,6 +233,14 @@ const handlePageChange = (page: number, index: number) => {
 
   log(_id, page, perPage.value)
 }
+
+const handleWeeshesPageChange = (page: number) => {
+  userWeeshes(_id, page)
+}
+
+//hide details
+const hideAccount = ref(true)
+const hideBalance = ref(true)
 </script>
 
 <template>
@@ -456,14 +369,30 @@ const handlePageChange = (page: number, index: number) => {
       </CardHeader>
     </Card>
 
-    <Card class="px-2 py-4 mx-1 w-full rounded-xl shadow-md lg:mx-0">
+    <Card class="px-2 py-4 w-full rounded-xl shadow-md">
       <Tabs default-value="weeshes" class="space-y-2">
         <TabsList class="w-full bg-transparent">
-          <TabsTrigger value="weeshes" class="text-[#000000] data-[state=active]:border-[#baef23]">
+          <TabsTrigger
+            value="weeshes"
+            class="text-[#000000] data-[state=active]:border-[#baef23]"
+            @click="
+              () => {
+                userWeeshes(_id, 1)
+              }
+            "
+          >
             Weeshes
           </TabsTrigger>
-          <TabsTrigger value="bank" class="text-[#000000] data-[state=active]:border-[#baef23]">
-            Bank
+          <TabsTrigger
+            value="bank"
+            class="text-[#000000] data-[state=active]:border-[#baef23]"
+            @click="
+              () => {
+                wallet(_id)
+              }
+            "
+          >
+            Wallet
           </TabsTrigger>
           <TabsTrigger value="support" class="text-[#000000] data-[state=active]:border-[#baef23]"
             >Support
@@ -480,160 +409,414 @@ const handlePageChange = (page: number, index: number) => {
             Activity log
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="weeshes" class="space-y-4">
-          <div class="overflow-auto bg-white md:mx-4 rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow
-                  class="text-xs sm:text-sm md:text-base text-[#02072199] font-semibold bg-gray-200"
-                >
-                  <TableHead> Name of Weesh </TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>
-                    <div class="flex items-center">
-                      Price
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div class="flex items-center">
-                      Changes
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
 
-                  <TableHead>
-                    <div class="flex items-center">
-                      Status
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="user in users" :key="user._id">
-                  <TableCell class="font-medium">{{ user.nameofweeshes }}</TableCell>
-                  <TableCell class="font-medium">{{ user.category }}</TableCell>
-                  <TableCell class="font-normal text-xs">{{ user.price }} </TableCell>
-                  <TableCell class="font-medium">{{ user.changes }} </TableCell>
-                  <TableCell class="">
-                    <!-- Render multiple status icons based on user's status array -->
-                    <template v-for="status in user.status" :key="status">
-                      <span
-                        :class="{
-                          'bg-[#6A70FF] text-[#F8F9FF]': status === 'Fulfiled',
-                          'bg-[#373B4D] text-[#F8F9FF]': status === 'Added',
-                          'bg-[#EE9F39] text-[#F8F9FF]': status === 'Initiated',
-                          'bg-[#53eeb8] text-[#F8F9FF]': status === 'Delivered'
-                        }"
-                        class="inline-block bg-[#373B4D] text-[#F8F9FF] rounded-full px-2 py-1 text-sm"
-                        >{{ status }}</span
-                      >
-                    </template>
-                  </TableCell>
-                  <TableCell>
-                    <svg
-                      width="20"
-                      height="50"
-                      viewBox="0 0 20 50"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+        <TabsContent value="weeshes" class="space-y-4">
+          <div class="flex flex-wrap gap-3 flex-row px-2 sm:px-6 py-4 w-full mt-6">
+            <Button
+              variant="outline"
+              class="rounded-2xl bg-[#EEEFF5]"
+              @click="
+                () => {
+                  userWeeshes(_id)
+                }
+              "
+            >
+              <div class="flex items-center text-[15px]">
+                <Icon icon="tdesign:clear" width="15" height="15" class="me-2" />
+                Clear Filter
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              class="rounded-2xl bg-[#EEEFF5]"
+              @click="
+                () => {
+                  sortPrice = sortPrice === 'desc' ? 'asc' : 'desc'
+                }
+              "
+            >
+              <div class="flex items-center text-[15px]">Sort by Price</div>
+            </Button>
+            <Search class="flex-grow" v-model="search" />
+          </div>
+          <div v-if="weeshesError" class="text-[#02072199] p-10">
+            {{ weeshesError }}
+          </div>
+          <div v-else-if="userWeeshesList.length">
+            <div v-for="weeshes in userWeeshesList" :key="weeshes._id">
+              <Card class="px-4 py-10 my-4 w-11/12 mx-auto shadow-md">
+                <div class="flex items-center justify-end mb-6 mr-4">
+                  <div class="rounded-full p-2 bg-[#EEEFF5]">
+                    <Icon
+                      :icon="weeshes.isLocked ? 'jam:padlock' : 'jam:padlock-open'"
+                      width="24"
+                      height="24"
+                    />
+                  </div>
+                  <div
+                    :class="statusBg(weeshes.status)"
+                    class="rounded-full h-fit w-fit py-2 px-6 text-white text-sm capitalize ml-6"
+                  >
+                    {{ weeshes.status.toLocaleLowerCase() }}
+                  </div>
+                </div>
+                <div class="xl:flex xl:justify-between xl:items-center mb-4">
+                  <Carousel class="w-7/12 lg:w-4/12 mx-auto">
+                    <CarouselContent>
+                      <CarouselItem v-for="image in weeshes.images" :key="image._id">
+                        <img :src="image.url" alt="display" class="w-full" />
+                      </CarouselItem>
+                    </CarouselContent>
+                    <CarouselPrevious class="bg-[#baef23]" />
+                    <CarouselNext class="bg-[#baef23]" />
+                  </Carousel>
+                  <div class="w-11/12 mx-auto xl:w-6/12 flex flex-col justify-end xl:mx-0 xl:mt-8">
+                    <p
+                      class="flex flex-row justify-between lg:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
                     >
-                      <path
-                        d="M7 31L12.5118 26.0606C13.1627 25.4773 13.1627 24.5227 12.5118 23.9394L7 19"
-                        stroke="#54586D"
-                        stroke-opacity="0.8"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                      <span class="text-[#02072199] text-xs md:text-sm">Name :</span>
+                      <span class="text-blue-400 font-bold text-xs md:text-sm">{{
+                        weeshes.name
+                      }}</span>
+                    </p>
+                    <div>
+                      <p
+                        class="flex justify-between lg:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
+                      >
+                        <span class="text-[#02072199] text-xs md:text-sm lg:text-sm">Price :</span>
+                        <span class="text-xs md:text-sm lg:text-sm text-[#020721]"
+                          >{{ weeshes.currency.code }}{{ weeshes.price.price }}</span
+                        >
+                      </p>
+                      <p
+                        class="flex justify-between lg:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
+                      >
+                        <span class="text-[#02072199] text-xs md:text-sm lg:text-sm"
+                          >Genie Charges :</span
+                        >
+                        <span class="text-xs md:text-sm lg:text-sm text-[#020721]"
+                          >{{ weeshes.currency.code }}{{ weeshes.price.genieGratuity }}</span
+                        >
+                      </p>
+                    </div>
+                    <div class="flex justify-between flex-col">
+                      <p
+                        class="flex justify-between flex-row xl:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
+                      >
+                        <span class="text-[#02072199] text-xs md:text-sm">Category :</span>
+                        <span class="text-xs md:text-sm text-[#020721] md:ml-4">
+                          {{ weeshes.category.name }}</span
+                        >
+                      </p>
+                      <p
+                        class="flex flex-row justify-between xl:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
+                      >
+                        <span class="text-[#02072199] text-xs md:text-sm">Wish Year :</span>
+                        <span class="text-xs md:text-sm text-[#020721] ml-4">
+                          {{ weeshes.wishYear }}</span
+                        >
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="my-6 w-11/12 mx-auto">
+                  <Button
+                    variant="outline"
+                    class="rounded-xl bg-[#EEEFF5] col-span-3 md:col-span-1 my-4"
+                    @click="
+                      () => {
+                        toggleContributors(weeshes._id)
+                      }
+                    "
+                  >
+                    <div class="flex items-center text-[10px] md:text-xs">
+                      Progress
+                      <Icon
+                        :icon="
+                          visibleContributors[weeshes._id]
+                            ? 'mdi-light:chevron-up'
+                            : 'mdi-light:chevron-down'
+                        "
+                        width="20"
                       />
-                    </svg>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                    </div>
+                  </Button>
+                  <div class="flex items-center">
+                    <Progress :model-value="getContributionPercentage(weeshes)" class="mr-2" />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Icon icon="noto:wrapped-gift" width="40" height="40" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{{ getContributionPercentage(weeshes) }}%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+                <div
+                  v-for="contributors in weeshes.contributions"
+                  :key="contributors._id"
+                  class="my-4"
+                >
+                  <transition name="fade">
+                    <div v-if="visibleContributors[weeshes._id]">
+                      <div class="relative py-0.5 px-4">
+                        <div
+                          class="flex justify-between lg:mx-4 px-4 shadow-md md:px-6 py-2 my-2 rounded-full border"
+                        >
+                          <p
+                            v-if="contributors.isContributorAnonymous"
+                            class="text-[#02072199] text-xs md:text-sm lg:text-sm"
+                          >
+                            Annonymous
+                          </p>
+                          <p v-else class="text-[#02072199] text-xs md:text-sm lg:text-sm">
+                            {{ contributors.contributor.firstName }}
+                            {{ contributors.contributor.lastName }}
+                          </p>
+                          <p class="italic text-xs md:text-sm lg:text-sm text-[#020721]">
+                            {{ contributors.amount }}
+                          </p>
+                        </div>
+                        <div class="absolute -top-5 left-7">
+                          <div
+                            v-if="
+                              contributors.contributor.avatar !== null &&
+                              !contributors.isContributorAnonymous
+                            "
+                          >
+                            <img
+                              :src="contributors.contributor.avatar"
+                              class="w-4/12 rounded-full border border-2 border-[#baef23]"
+                              alt="avatar"
+                            />
+                          </div>
+                          <div v-else>
+                            <Icon
+                              icon="iconamoon:profile-circle-duotone"
+                              width="35"
+                              height="35"
+                              class="mt-2 text-blue-400"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </transition>
+                </div>
+              </Card>
+            </div>
+            <PagePagination
+              :page-total="weeshesPageTotal"
+              :page-current="weeshesCurrentPage"
+              @pagination="handleWeeshesPageChange"
+            />
+          </div>
+          <div v-else class="text-[#02072199] p-10">
+            <p>No user data available</p>
           </div>
         </TabsContent>
 
         <TabsContent value="bank" class="space-y-4">
+          <div class="xl:flex gap-4 mx-4 mt-8 mb-14" v-if="userWallet">
+            <Card
+              class="h-[200px] rounded-[24px] transition-transform w-11/12 mx-auto xl:w-6/12 transform hover:scale-105 bg-[#EE9F39] cardShadow2 border-transparent"
+            >
+              <div class="h-[200px] pt-4 relative rounded-tr-[24px] rounded-tl-[24px]">
+                <CardContent class="flex justify-end space-y-0">
+                  <div class="weeshr-icon2 rounded-[7px] mr-4">
+                    <Icon
+                      icon="iconamoon:profile-light"
+                      width="24px"
+                      height="24px"
+                      color="#ee9f39"
+                    />
+                  </div>
+                  <div class="text-sm text-[#ffffff] absolute bottom-10 left-5 w-10/12">
+                    <div class="md:flex items-center justify-between">
+                      <p>Account Name :</p>
+                      <p class="italic font-medium text-lg">{{ userWallet.account_name }}</p>
+                    </div>
+                    <div>
+                      <p>Account Number :</p>
+                      <div class="md:flex md:justify-between items-center gap-4">
+                        <div v-if="hideAccount" class="flex py-2">
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                        </div>
+                        <p v-else class="italic font-medium">
+                          {{ userWallet.account_number }}
+                        </p>
+                        <Icon
+                          :icon="
+                            hideAccount ? 'fluent:eye-off-16-regular' : 'fluent:eye-16-regular'
+                          "
+                          @click="
+                            () => {
+                              hideAccount = !hideAccount
+                            }
+                          "
+                          width="24"
+                          height="24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
+            <Card
+              class="h-[200px] rounded-[24px] transition-transform w-11/12 mx-auto xl:w-6/12 px-4 transform hover:scale-105 bg-[#6A70FF] cardShadow3 border-transparent mt-8 xl:mt-0"
+            >
+              <div class="h-[200px] pt-4 relative rounded-tr-[24px] rounded-tl-[24px]">
+                <CardContent class="flex justify-end space-y-0">
+                  <div class="weeshr-icon2 rounded-[7px]">
+                    <Icon icon="tdesign:money" width="24px" height="24px" color="#6a70ff" />
+                  </div>
+                  <div class="text-sm text-[#ffffff] absolute bottom-10 left-5 w-10/12">
+                    <div class="flex items-center justify-between">
+                      <p>Balance :</p>
+                      <div class="flex justify-between items-center gap-4">
+                        <div v-if="hideBalance" class="flex py-2">
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                        </div>
+                        <p v-else class="italic font-medium text-lg">
+                          {{ userWallet.balance }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="md:flex items-center justify-between mt-2">
+                      <p>Ledger Balance :</p>
+                      <div class="flex justify-between items-center">
+                        <div v-if="hideBalance" class="flex py-2 mr-2">
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                          <Icon icon="mage:stars-c" width="18" height="18" />
+                        </div>
+                        <p v-else class="italic font-medium text-lg mr-2">
+                          {{ userWallet.ledger_balance }}
+                        </p>
+                        <Icon
+                          :icon="
+                            hideBalance ? 'fluent:eye-off-16-regular' : 'fluent:eye-16-regular'
+                          "
+                          @click="
+                            () => {
+                              hideBalance = !hideBalance
+                            }
+                          "
+                          width="24"
+                          height="24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
+          </div>
           <div class="overflow-auto bg-white rounded-md md:mx-6">
-            <Table class="min-w-full">
-              <TableHeader>
-                <TableRow
-                  class="text-xs sm:text-sm md:text-base text-[#02072199] font-semibold bg-gray-200"
-                >
-                  <TableHead>
-                    <div class="flex items-center">
-                      Type
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div class="flex items-center">
-                      Date
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div class="flex items-center">
-                      Amount
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div class="flex items-center">
-                      Status
-                      <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
-                    </div>
-                  </TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-for="user2 in user2s" :key="user2._id">
-                  <TableCell class="font-medium">{{ user2.type }}</TableCell>
-                  <TableCell class="font-medium">{{ user2.date }}</TableCell>
-                  <TableCell class="font-normal text-xs">{{ user2.amount }} </TableCell>
-                  <TableCell class="">
-                    <template v-for="status in user2.status" :key="status">
-                      <span
-                        :class="{
-                          'bg-[#53eeb8] text-[#F8F9FF]': status === 'Successful',
-                          'bg-[#373B4D] text-[#F8F9FF]': status === ' Pending',
-                          'bg-[#EE9F39] text-[#F8F9FF]': status === 'Failed'
-                        }"
-                        class="inline-block bg-[#373B4D] text-[#F8F9FF] rounded-full px-2 py-1 text-sm"
-                        >{{ status }}</span
+            <div v-if="walletError" class="text-[#02072199] p-10">
+              {{ walletError }}
+            </div>
+            <div v-else-if="userWalletList">
+              <Table class="min-w-full">
+                <TableHeader>
+                  <TableRow
+                    class="text-xs sm:text-sm md:text-base text-[#02072199] font-semibold bg-gray-200"
+                  >
+                    <TableHead>
+                      <div class="flex items-center">
+                        Type
+                        <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div class="flex items-center">
+                        Date
+                        <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div class="flex items-center">
+                        Amount
+                        <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div class="flex items-center">
+                        Status
+                        <Icon icon="fluent:chevron-up-down-20-regular" class="ml-1" />
+                      </div>
+                    </TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <!-- <TableRow>
+                    <TableCell class="font-medium">{{ user2.type }}</TableCell>
+                    <TableCell class="font-medium">{{ user2.date }}</TableCell>
+                    <TableCell class="font-normal text-xs">{{ user2.amount }} </TableCell>
+                    <TableCell class="">
+                      <template v-for="status in user2.status" :key="status">
+                        <span
+                          :class="{
+                            'bg-[#53eeb8] text-[#F8F9FF]': status === 'Successful',
+                            'bg-[#373B4D] text-[#F8F9FF]': status === ' Pending',
+                            'bg-[#EE9F39] text-[#F8F9FF]': status === 'Failed'
+                          }"
+                          class="inline-block bg-[#373B4D] text-[#F8F9FF] rounded-full px-2 py-1 text-sm"
+                          >{{ status }}</span
+                        >
+                      </template>
+                    </TableCell>
+                    <TableCell>
+                      <svg
+                        width="20"
+                        height="50"
+                        viewBox="0 0 20 50"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                    </template>
-                  </TableCell>
-                  <TableCell>
-                    <svg
-                      width="20"
-                      height="50"
-                      viewBox="0 0 20 50"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M7 31L12.5118 26.0606C13.1627 25.4773 13.1627 24.5227 12.5118 23.9394L7 19"
-                        stroke="#54586D"
-                        stroke-opacity="0.8"
-                        stroke-width="2"
-                        stroke-miterlimit="10"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                        <path
+                          d="M7 31L12.5118 26.0606C13.1627 25.4773 13.1627 24.5227 12.5118 23.9394L7 19"
+                          stroke="#54586D"
+                          stroke-opacity="0.8"
+                          stroke-width="2"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </TableCell>
+                  </TableRow> -->
+                </TableBody>
+              </Table>
+            </div>
+            <div v-else class="text-[#02072199] p-10">
+              <p>No user data available</p>
+            </div>
           </div>
         </TabsContent>
+
         <TabsContent value="support" class="space-y-4"> </TabsContent>
+
         <TabsContent value="activity" class="space-y-4">
           <div v-if="logError" class="text-[#02072199] p-10">
             <p>{{ logError }}</p>
@@ -804,5 +987,17 @@ const handlePageChange = (page: number, index: number) => {
   background: linear-gradient(132deg, rgba(255, 255, 255, 1) 1%, rgba(186, 239, 35, 1) 58%);
   top: 3%;
   left: 5%;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
 }
 </style>
